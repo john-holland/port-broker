@@ -1,0 +1,9 @@
+services:
+  port-broker:
+    build: .
+    ports:
+      - "8765:8765"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - NODE_ENV=production 
