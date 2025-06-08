@@ -9,6 +9,24 @@ const docker = new Docker();
 app.use(cors());
 app.use(express.json());
 
+// Check if another port-broker is already running
+async function checkExistingPortBroker() {
+  try {
+    const containers = await docker.listContainers();
+    const existingBroker = containers.find(container => 
+      container.Names.some(name => name.includes('port-broker')) && 
+      container.State === 'running'
+    );
+    
+    if (existingBroker) {
+      console.log('Found existing port-broker instance, exiting...');
+      process.exit(0);
+    }
+  } catch (error) {
+    console.error('Error checking for existing port-broker:', error);
+  }
+}
+
 app.get('/port', async (req, res) => {
   try {
     const containers = await docker.listContainers();
@@ -42,6 +60,9 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-app.listen(port, () => {
-  console.log(`Port broker service listening on port ${port}`);
+// Check for existing port-broker before starting
+checkExistingPortBroker().then(() => {
+  app.listen(port, () => {
+    console.log(`Port broker service listening on port ${port}`);
+  });
 }); 

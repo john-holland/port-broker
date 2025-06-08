@@ -6,4 +6,11 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      - NODE_ENV=production 
+      - NODE_ENV=production
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    networks:
+      - wave-reader-network
+
+networks:
+  wave-reader-network:
+    driver: bridge 
